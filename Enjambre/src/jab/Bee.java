@@ -26,55 +26,61 @@ public class Bee extends Module implements Droid {
 	}
 
 	// All the used parts
-	Radar smartSpinningRadar = new SmartSpinningRadar(this);
+	Radar noRadar = new NoRadar(this);
 	SelectEnemy diamondMelee = new DiamondMelee(this);
 	SelectEnemy atackTheLeader = new AtackTheLeader(this);
 	SelectEnemy assigned = new Assigned(this);
 	Gun ceaseFire = new CeaseFire(this);
 	Gun maximum = new Maximum(this);
-	Gun fireWhenClose = new FireWhenClose(this);
+	Gun fireWhenClose = new FireWhenEnemyClose(this);
+	Gun fireWhenClosestClose = new FireWhenClosestClose(this);
 	Targeting guessFactor = new GuessFactorMelee(this);
+	Targeting linearTheClosest = new LinearTargetingTheClosest(this);
 	Targeting linear = new LinearTargeting(this);
-	Targeting headOn = new HeadOnTargeting(this);
 	Targeting quietGun = new QuietGun(this);
 	Targeting blindFighterTargetingAndGun = new BlindFighterTargetingAndGun(this);
 	Movement quiet = new Quiet(this);
-	Movement antiGravity = new AntiGravity(this);
+	Movement linearAntiGravityRamming = new LinearAntiGravityRamming(this);
 	Movement blindFighterMovement = new BlindFighterMovement(this);
-	
-	public boolean infoOfAllTeammates=false;
-	
+
+	public boolean infoOfAllTeammates = false;
+
 	protected void selectBehavior() {
-		
+
 		// Radar
-		radar = smartSpinningRadar;
-		
+		radar = noRadar;
+
 		// Enemies: the leader and all droids
-		if (getEnemiesLeader()!=null && getCurrentNumberDroidEnemies()==getCurrentNumberOfEnemies()-1){
+		if (getEnemiesLeader() != null && getCurrentNumberDroidEnemies() == getCurrentNumberOfEnemies() - 1) {
 			selectEnemy = atackTheLeader;
 		} else {
 			selectEnemy = assigned;
 		}
 
-		movement = antiGravity;
-		
-		if (enemy!=null && getCurrentRoundScannedEnemies() > 0) {
-			targeting = linear;
-			gun = fireWhenClose;
+		movement = linearAntiGravityRamming;
+
+		if (enemy != null && getCurrentRoundScannedEnemies() > 0) {
+			if (enemy.distance < FireWhenEnemyClose.CONSIDER_CLOSE) {
+				targeting = linear;
+				gun = fireWhenClose;
+			} else {
+				targeting = linearTheClosest;
+				gun = fireWhenClosestClose;
+			}
 		} else {
 			targeting = quietGun;
 			gun = ceaseFire;
 		}
 
-		if (!infoOfAllTeammates && getCurrentNumberOfTeamMates()==this.getTeammates().length){
-			infoOfAllTeammates=true;
+		if (!infoOfAllTeammates && getCurrentNumberOfTeamMates() == this.getTeammates().length) {
+			infoOfAllTeammates = true;
 		}
 		// We are all droids
 		// Credits go to BlindDroid - a robot by (Kwok-Cheung Li)
-		if (infoOfAllTeammates && getTeamLeader()==null){
+		if (infoOfAllTeammates && getTeamLeader() == null) {
 			targeting = blindFighterTargetingAndGun;
 			movement = blindFighterMovement;
-			gun=ceaseFire;
+			gun = ceaseFire;
 		}
 	}
 }

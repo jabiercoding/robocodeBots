@@ -50,7 +50,7 @@ public abstract class Module extends TeamRobot {
 	// A Vector of all the fired bullets
 	// public Vector<BulletInfo> bullets = new Vector<BulletInfo>();
 	public Vector<BulletInfoEnemy> enemyBullets = new Vector<BulletInfoEnemy>();
-	
+
 	// Team leader
 	public static boolean teamLeader = false;
 
@@ -74,11 +74,9 @@ public abstract class Module extends TeamRobot {
 		});
 
 		if (battleField == null) {
-			battleField = new Rectangle2D.Double(BOT_WIDTH / 2, BOT_WIDTH / 2,
-					getBattleFieldWidth() - BOT_WIDTH, getBattleFieldHeight()
-							- BOT_WIDTH);
-			totalNumOfEnemies = getOthers()
-					- (getTeammates() == null ? 0 : getTeammates().length);
+			battleField = new Rectangle2D.Double(BOT_WIDTH / 2, BOT_WIDTH / 2, getBattleFieldWidth() - BOT_WIDTH,
+					getBattleFieldHeight() - BOT_WIDTH);
+			totalNumOfEnemies = getOthers() - (getTeammates() == null ? 0 : getTeammates().length);
 			enemyNumAssignation = new String[totalNumOfEnemies];
 		}
 		initialize();
@@ -97,16 +95,13 @@ public abstract class Module extends TeamRobot {
 	protected abstract void initialize();
 
 	private void updateEnemyPositions() {
-		Rectangle2D.Double walkableBattleField = new Rectangle2D.Double(
-				BOT_WIDTH / 2 - 3, BOT_WIDTH / 2 - 3, getBattleFieldWidth()
-						- BOT_WIDTH + 6, getBattleFieldHeight() - BOT_WIDTH + 6);
+		Rectangle2D.Double walkableBattleField = new Rectangle2D.Double(BOT_WIDTH / 2 - 3, BOT_WIDTH / 2 - 3,
+				getBattleFieldWidth() - BOT_WIDTH + 6, getBattleFieldHeight() - BOT_WIDTH + 6);
 		Enumeration<BotInfo> enemies = botsInfo.elements();
 		while (enemies.hasMoreElements()) {
 			BotInfo botInfo = enemies.nextElement();
-			double newX = Math.sin(botInfo.headingRadians) * botInfo.velocity
-					+ botInfo.x;
-			double newY = Math.cos(botInfo.headingRadians) * botInfo.velocity
-					+ botInfo.y;
+			double newX = Math.sin(botInfo.headingRadians) * botInfo.velocity + botInfo.x;
+			double newY = Math.cos(botInfo.headingRadians) * botInfo.velocity + botInfo.y;
 			Point2D.Double newPos = new Point2D.Double(newX, newY);
 			if (walkableBattleField.contains(newPos)) {
 				botInfo.x = newX;
@@ -192,10 +187,8 @@ public abstract class Module extends TeamRobot {
 		Enumeration<BulletInfoEnemy> i = enemyBullets.elements();
 		while (i.hasMoreElements()) {
 			BulletInfoEnemy bullet = i.nextElement();
-			bullet.x = /*-1 */Math.sin(bullet.headingRadians)
-					* bullet.velocity + bullet.x;
-			bullet.y = /*-1 */Math.cos(bullet.headingRadians)
-					* bullet.velocity + bullet.y;
+			bullet.x = /*-1 */Math.sin(bullet.headingRadians) * bullet.velocity + bullet.x;
+			bullet.y = /*-1 */Math.cos(bullet.headingRadians) * bullet.velocity + bullet.y;
 			if (!battleField.contains(bullet)) {
 				enemyBullets.remove(bullet);
 			}
@@ -226,17 +219,15 @@ public abstract class Module extends TeamRobot {
 		scanned.previousHeadingRadians = scanned.headingRadians;
 		scanned.headingRadians = e.getHeadingRadians();
 		scanned.distance = e.getDistance();
-		scanned.x = getX() + e.getDistance()
-				* Math.sin(getHeadingRadians() + e.getBearingRadians());
-		scanned.y = getY() + e.getDistance()
-				* Math.cos(getHeadingRadians() + e.getBearingRadians());
+		scanned.x = getX() + e.getDistance() * Math.sin(getHeadingRadians() + e.getBearingRadians());
+		scanned.y = getY() + e.getDistance() * Math.cos(getHeadingRadians() + e.getBearingRadians());
 		scanned.velocity = e.getVelocity();
 		scanned.previousEnergy = scanned.energy;
 		scanned.energy = e.getEnergy();
 		scanned.timeSinceLastScan = (int) e.getTime() - scanned.timeScanned;
 		scanned.timeScanned = (int) e.getTime();
 		if (botsInfo.get(e.getName()) == null) {
-			//Scanned for the first time
+			// Scanned for the first time
 			if (scanned.energy > 190) {
 				scanned.leader = true;
 				if (scanned.energy > 210) {
@@ -268,10 +259,8 @@ public abstract class Module extends TeamRobot {
 			enemyBullet.x = enemy.x;
 			enemyBullet.y = enemy.y;
 			enemyBullet.power = enemy.previousEnergy - enemy.energy;
-			enemyBullet.headingRadians = Utils.normalAbsoluteAngle(Math.atan2(
-					enemy.x - getX(), enemy.y - getY()));
-			enemyBullet.velocity = robocode.Rules
-					.getBulletSpeed(enemyBullet.power);
+			enemyBullet.headingRadians = Utils.normalAbsoluteAngle(Math.atan2(enemy.x - getX(), enemy.y - getY()));
+			enemyBullet.velocity = robocode.Rules.getBulletSpeed(enemyBullet.power);
 			enemyBullet.isFriendFire = false;
 			enemyBullet.isToRemove = false;
 			enemyBullets.add(enemyBullet);
@@ -382,9 +371,14 @@ public abstract class Module extends TeamRobot {
 
 	public void onPaint(Graphics2D g) {
 		g.setColor(Color.white);
-		Enumeration<BotInfo> enemies = botsInfo.elements();
-		while (enemies.hasMoreElements()) {
-			BotInfo enemy = enemies.nextElement();
+		Enumeration<BotInfo> botsInfos = botsInfo.elements();
+		while (botsInfos.hasMoreElements()) {
+			BotInfo enemy = botsInfos.nextElement();
+			if (enemy.teammate) {
+				g.setColor(Color.green);
+			} else {
+				g.setColor(Color.white);
+			}
 			g.draw(enemy.getBotRectangle());
 		}
 		if (enemy != null) {
@@ -401,12 +395,12 @@ public abstract class Module extends TeamRobot {
 
 		g.setColor(Color.white);
 		g.draw(battleField);
-		g
-				.drawString(
-						"Debug option= "
-								+ debugOption
-								+ "      0: All      1: SelectEnemy      2: Radar      3: Gun      4: Targeting      5: Movement      6: Specials",
-						15, 15);
+		g.drawString("Debug option= " + debugOption
+				+ "  0: All   1: SelectEnemy   2: Radar   3: Gun   4: Targeting   5: Movement   6: Specials", 15, 15);
+		g.drawString("Current option= " + debugOption + "   1: " + selectEnemy.getClass().getSimpleName() + "   2: "
+				+ radar.getClass().getSimpleName() + "   3: " + gun.getClass().getSimpleName() + "   4: "
+				+ targeting.getClass().getSimpleName() + "   5: " + movement.getClass().getSimpleName() + "   6: "
+				+ specials.toString(), 15, 5);
 		switch (debugOption) {
 		case 0:
 			selectEnemy.onPaint(g);
@@ -448,22 +442,18 @@ public abstract class Module extends TeamRobot {
 				assignNumToEnemy(botInfo.name);
 			}
 			botInfo.bearingRadians = getBearing(botInfo);
-			botInfo.distance = botInfo.distance(new Point2D.Double(getX(),
-					getY()));
+			botInfo.distance = botInfo.distance(new Point2D.Double(getX(), getY()));
 			botsInfo.put(botInfo.name, botInfo);
 		} else if (e.getMessage() instanceof BulletInfoEnemy) {
 			BulletInfoEnemy bullet = (BulletInfoEnemy) e.getMessage();
 			if (!bullet.isToRemove) {
 				enemyBullets.add(bullet);
 			} else {
-				Enumeration<BulletInfoEnemy> enumeration = enemyBullets
-						.elements();
+				Enumeration<BulletInfoEnemy> enumeration = enemyBullets.elements();
 				while (enumeration.hasMoreElements()) {
 					BulletInfoEnemy b = enumeration.nextElement();
-					if (b.isFriendFire && bullet.isFriendFire
-							&& b.fromName.equals(bullet.fromName)
-							&& b.power == bullet.power
-							&& b.headingRadians == bullet.headingRadians
+					if (b.isFriendFire && bullet.isFriendFire && b.fromName.equals(bullet.fromName)
+							&& b.power == bullet.power && b.headingRadians == bullet.headingRadians
 							&& b.distance(bullet) < 50) {
 						enemyBullets.remove(b);
 					}
@@ -477,10 +467,10 @@ public abstract class Module extends TeamRobot {
 		BotInfo me = new BotInfo();
 		me.teammate = true;
 		me.name = getName();
-		if (this.getTime()<25 && this.getEnergy()>190){
-			teamLeader=true;
+		if (this.getTime() < 25 && this.getEnergy() > 190) {
+			teamLeader = true;
 		}
-		me.leader=teamLeader;
+		me.leader = teamLeader;
 		me.headingRadians = getHeadingRadians();
 		me.x = getX();
 		me.y = getY();
@@ -569,7 +559,7 @@ public abstract class Module extends TeamRobot {
 		}
 		return null;
 	}
-	
+
 	public BotInfo getTeamLeader() {
 		Enumeration<BotInfo> enemies = botsInfo.elements();
 		while (enemies.hasMoreElements()) {
@@ -592,18 +582,54 @@ public abstract class Module extends TeamRobot {
 		return false;
 	}
 
-	public int getNumberOfEnemies() {
-		return getOthers()
-				- (getTeammates() == null ? 0 : getTeammates().length);
+	private Integer initialNumberOfEnemies = null;
+
+	public int getInitialNumberOfEnemies() {
+		if (initialNumberOfEnemies == null) {
+			initialNumberOfEnemies = getOthers() - getInitialNumberOfTeamMates();
+		}
+		return initialNumberOfEnemies;
 	}
 
-	public int getNumberOfTeamMates() {
-		return (getTeammates() == null ? 0 : getTeammates().length);
+	private boolean allScannedAtLeastOnce = false;
+
+	public boolean isAllScannedAtLeastOnce() {
+		if (!allScannedAtLeastOnce && getCurrentNumberOfEnemies() == getInitialNumberOfEnemies()) {
+			allScannedAtLeastOnce = true;
+		}
+		return allScannedAtLeastOnce;
+	}
+
+	public int getInitialNumberOfTeamMates() {
+		if (getTeammates() == null) {
+			return 0;
+		} else {
+			return getTeammates().length;
+		}
+	}
+
+	public boolean isOneOnOneBattle() {
+		return (getInitialNumberOfEnemies() == 1);
 	}
 
 	public double getBearing(Point2D.Double botInfo) {
-		double thetaFireTime = Utils.normalAbsoluteAngle(Math.atan2(botInfo.x
-				- getX(), botInfo.y - getY()));
+		double thetaFireTime = Utils.normalAbsoluteAngle(Math.atan2(botInfo.x - getX(), botInfo.y - getY()));
 		return Utils.normalRelativeAngle(thetaFireTime - getHeadingRadians());
+	}
+
+	public BotInfo getClosestEnemy() {
+		Enumeration<BotInfo> enemies = botsInfo.elements();
+		BotInfo closest = null;
+		double min = Double.MAX_VALUE;
+		while (enemies.hasMoreElements()) {
+			BotInfo botInfo = enemies.nextElement();
+			if (!botInfo.teammate) {
+				if (botInfo.distance < min) {
+					min = botInfo.distance;
+					closest = botInfo;
+				}
+			}
+		}
+		return closest;
 	}
 }

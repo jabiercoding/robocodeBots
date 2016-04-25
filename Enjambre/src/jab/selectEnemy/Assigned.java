@@ -60,7 +60,7 @@ public class Assigned extends SelectEnemy {
 	public void onPaint(Graphics2D g) {
 		if (bot.enemy != null) {
 			g.setColor(Color.RED);
-			g.fillOval((int) bot.enemy.x - 20, (int) bot.enemy.y - 20, 40, 40);
+			g.drawOval((int) bot.enemy.x - 20, (int) bot.enemy.y - 20, 40, 40);
 		}
 	}
 }

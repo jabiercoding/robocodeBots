@@ -10,7 +10,7 @@ public class AtackTheLeader extends SelectEnemy {
 	}
 
 	public void select() {
-		bot.enemy=bot.getEnemiesLeader();
+		bot.enemy = bot.getEnemiesLeader();
 	}
-	
+
 }

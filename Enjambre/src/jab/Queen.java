@@ -24,7 +24,6 @@ public class Queen extends Module {
 		setRadarColor(Color.BLACK);
 		setScanColor(Color.YELLOW);
 		setBulletColor(Color.YELLOW);
-		oneOnOne = (getNumberOfEnemies()==1);
 	}
 
 	// All the used parts
@@ -33,7 +32,6 @@ public class Queen extends Module {
 	Radar spinningRadar = new SpinningRadar(this);
 	Radar smartSpinningRadar = new SmartSpinningRadar(this);
 	Radar wideLock = new WideLock(this);
-	Radar superWideLock = new SuperWideLock(this);
 	Gun ceaseFire = new CeaseFire(this);
 	Gun maximum = new Maximum(this);
 	Targeting guessFactor = new GuessFactorMelee(this);
@@ -43,23 +41,26 @@ public class Queen extends Module {
 	Movement quiet = new Quiet(this);
 	Movement diamondMovement = new DiamondMovement(this);
 	Special assignationManager = new AssignationManager(this);
-	
-	boolean allScanned = false;
-	boolean oneOnOne = false;
-	
-	protected void selectBehavior() {
 
-		// Radar
-		if (oneOnOne || (!oneOnOne && getCurrentNumberOfEnemies()==1)){
-			radar=wideLock;
-		} else if (getCurrentNumberOfEnemies()<getNumberOfEnemies()){
-			radar = spinningRadar;
-		} else {
-			radar = smartSpinningRadar;
-		}
+	protected void selectBehavior() {
 		
+		// Radar
+		if (isOneOnOneBattle()) {
+			radar = wideLock;
+		} else {
+			if (!isAllScannedAtLeastOnce()) {
+				radar = spinningRadar;
+			} else {
+				if (getCurrentNumberOfEnemies() == 1) {
+					radar = wideLock;
+				} else {
+					radar = smartSpinningRadar;
+				}
+			}
+		}
+
 		// Enemies: One leader and all droids
-		if (getEnemiesLeader()!=null && getCurrentNumberDroidEnemies()==getCurrentNumberOfEnemies()-1){
+		if (getEnemiesLeader() != null && getCurrentNumberDroidEnemies() == getCurrentNumberOfEnemies() - 1) {
 			selectEnemy = atackTheLeader;
 			deactivate(assignationManager);
 		} else {
@@ -68,8 +69,8 @@ public class Queen extends Module {
 		}
 
 		movement = diamondMovement;
-		
-		if (enemy!=null && getCurrentRoundScannedEnemies() > 0) {
+
+		if (enemy != null && getCurrentRoundScannedEnemies() > 0) {
 			targeting = guessFactor;
 			gun = maximum;
 		} else {

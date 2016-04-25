@@ -3,23 +3,25 @@ package jab.targeting;
 import java.awt.geom.Point2D;
 
 import robocode.util.Utils;
+import jab.module.BotInfo;
 import jab.module.Module;
 import jab.module.Targeting;
 
-public class LinearTargeting extends Targeting {
+public class LinearTargetingTheClosest extends Targeting {
 
-	public LinearTargeting(Module bot) {
+	public LinearTargetingTheClosest(Module bot) {
 		super(bot);
 	}
 
 	public void target() {
-		if (bot.enemy != null) {
+		BotInfo toTarget = bot.getClosestEnemy();
+		if (toTarget != null) {
 			double myX = bot.getX();
 			double myY = bot.getY();
-			double enemyX = bot.enemy.x;
-			double enemyY = bot.enemy.y;
-			double enemyHeading = bot.enemy.headingRadians;
-			double enemyVelocity = bot.enemy.velocity;
+			double enemyX = toTarget.x;
+			double enemyY = toTarget.y;
+			double enemyHeading = toTarget.headingRadians;
+			double enemyVelocity = toTarget.velocity;
 
 			double deltaTime = 0;
 			double battleFieldHeight = bot.getBattleFieldHeight(), battleFieldWidth = bot.getBattleFieldWidth();
